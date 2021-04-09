@@ -46,7 +46,7 @@ namespace ExampleMod
                     return Utils.LOCA("exampleoption", ELoca.UI); 
                 }, 
                 delegate (OptionsMenu self) { // What the text of the option's toggle should say. (GetBoolScring is a Monster Sanctuary function that translates a bool into a string, straightforward.)
-                    return self.GetBoolScring(ExampleConfigOption.Value); 
+                    return self.GetBoolScring(ExampleConfigOption.Value); // You can use a custom function to for example toggle between different options. (like combat speed.)
                 }, 
                 false, 
                 delegate (OptionsMenu self) { // A rule that lets you not allow the option if this matches.
@@ -66,9 +66,10 @@ namespace ExampleMod
 
         private void OptionsMenu_OnOptionsSelected(On.OptionsMenu.orig_OnOptionsSelected orig, OptionsMenu self, MenuListItem menuItem)
         {
+            // Here we handle what pressing options buttons does.
             string text = self.optionNames[self.GetCurrentOptionIndex()]; // Gets the option's name / token.
-            // Debug.Log(text);
-            if (text == "ExampleOption")
+            
+            if (text == "ExampleOption") // If the text matches our option then we handle stuff in here.
             {
                 // Now we toggle the value of the config option.
                 if (ExampleConfigOption.Value == true)
