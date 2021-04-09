@@ -35,9 +35,54 @@ namespace ExampleMod
                 "This is a example option." // The description
             );
 
+            // Registering a Language token into Monster Sanctuary, this allows for translations.
+            MonSancAPI.MonSancAPI.RegisterLanguageToken(new MonSancAPI.MonSancAPI.LanguageToken("exampleoption", "Example Option"));
+
+            // Registering a Option to show up in Monster Sanctuary's options menu.
+            MonSancAPI.MonSancAPI.RegisterOption(
+                MonSancAPI.MonSancAPI.optionType.gameplay, // Which tab you want your option to be in.
+                "ExampleOption",  // The Token for your option, you will need this to actually make the button do something.
+                delegate (OptionsMenu self) { // Returns the option name, useful if you want to use translations
+                    return Utils.LOCA("exampleoption", ELoca.UI); 
+                }, 
+                delegate (OptionsMenu self) { // What the text of the option's toggle should say. (GetBoolScring is a Monster Sanctuary function that translates a bool into a string, straightforward.)
+                    return self.GetBoolScring(ExampleConfigOption.Value); 
+                }, 
+                false, 
+                delegate (OptionsMenu self) { // A rule that lets you not allow the option if this matches.
+                    return false; 
+                }
+            );
+
+            // Currently you need to handle your config file yourself, options API is a bit half assed.
+            On.OptionsMenu.OnOptionsSelected += OptionsMenu_OnOptionsSelected;
+
+
             // To modify game functions you can use monomod.
             // This routes the OpenChest function into our function.
             On.Chest.OpenChest += Chest_OpenChest; 
+        }
+
+
+        private void OptionsMenu_OnOptionsSelected(On.OptionsMenu.orig_OnOptionsSelected orig, OptionsMenu self, MenuListItem menuItem)
+        {
+            string text = self.optionNames[self.GetCurrentOptionIndex()]; // Gets the option's name / token.
+            // Debug.Log(text);
+            if (text == "ExampleOption")
+            {
+                // Now we toggle the value of the config option.
+                if (ExampleConfigOption.Value == true)
+                {
+                    ExampleConfigOption.Value = false;
+                }
+                else
+                {
+                    ExampleConfigOption.Value = true;
+                }
+                ExampleConfigOption.ConfigFile.Save(); // Then we save it to write it to the config file.
+            }
+
+            orig(self, menuItem); // Don't forget to run the original function!
         }
 
         private void Chest_OpenChest(On.Chest.orig_OpenChest orig, Chest self)
